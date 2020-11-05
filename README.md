@@ -1,4 +1,4 @@
-buck50: Test and measurement firmware for "BLue Pill" STM32F103
+buck50: Test and measurement firmware for "Blue Pill" STM32F103
 ===============================================================
 
 **buck50** is open-source firmware that turns a "Blue Pill" STM32F103 development board (widely available for approx. US$1.50) into a multi-purpose test and measurement instrument, including:
@@ -114,7 +114,7 @@ Hardware connections
 
 The following is a highly simplified, edited version of the incredibly useful image created by Rasmus Friis Kjeldsen [<sup>5</sup>](#footnote_5), available at <http://reblag.dk/stm32/> (direct link: <http://reblag.dk/wordpress/wp-content/uploads/2016/07/The-Generic-STM32F103-Pinout-Diagram.pdf>). The edited and  [original](images/The-Generic-STM32F103-Pinout-Diagram.pdf) versions are included in this repository under terms in compliance with the original's [license](https://creativecommons.org/licenses/by-sa/1.0/).
 
-![](images/buck50_small.png "hardware connections")
+![](images/buck50_full.png "hardware connections")
 
 **WARNING!** Incorrect hookups to the "Blue Pill" (or any other microcontroller's) ports may cause permanent damage. Examples: Connecting a push-pull output port directly to a positive voltage source or ground sink, or to another push-pull output on the same or different MCU set to the opposite polarity. Readers of this document and users of the firmware it describes assume all responsibility for their actions.
 
