@@ -8,9 +8,9 @@ buck50: Test and measurement firmware for "Blue Pill" STM32F103
     * Units may be ganged for increased number of channels
     * Complex triggering via user-defined state machine supporting combinations of sequential ("A then B then C") and logical-OR ("A or B or C") conditionals
     * Output to VCD and other file formats for export to waveform viewing software [<sup>1</sup>](#footnote_1)
-* Live monitoring and logging of digital, analog, USART (sync/async), SPI (MOSI/MISO), and I2C data
+* Live monitoring and logging of digital, analog, USART (sync/async), SPI (MOSI/MISO), and I2C (master/slave/TX/RX) data
 * Simple dual-channel approx. 1 MHz digital storage oscilloscope, approx. 5K sample buffer depth (10K if single channel)
-* 3 channel digital pulse train generator with user-defined frequency and per-channel duty cycle and polarity.
+* 3 channel digital pulse train generator with user-defined frequency and per-channel duty cycle and polarity
 * Bidirectional bridge/converter from USART/UART (async/synchro), SPI (master/slave), or I2C ... to USB ... to host terminal, UNIX socket, or UNIX pty device file
 * 8-bit parallel output counter (binary or gray code)
 * Host terminal ascii or binary input data to 8-bit parallel output
@@ -326,7 +326,7 @@ After reading the above, an reasonable reaction might be: *You want me to type a
 
 A valid criticism ... but there is hope. That's why you, the sophisticated user, chose to read this section. ;) Remember all that stuff that got printed when the program started?
 
-        buck50.py 0.9.0
+        buck50.py 0.9.1
         Copyright 2020 Mark R. Rubin aka "thanks4opensource"
         This is free software with ABSOLUTELY NO WARRANTY.
         For details type "warranty" or "help warranty".
@@ -500,7 +500,7 @@ Commandline arguments:
 Normal startup:
 
         $ buck50.py
-        buck50.py 0.9.0
+        buck50.py 0.9.1
         Copyright 2020 Mark R. Rubin aka "thanks4opensource"
         This is free software with ABSOLUTELY NO WARRANTY.
         For details type "warranty" or "help warranty".
@@ -508,7 +508,7 @@ Normal startup:
         Type "help" for commands, configurations, parameters, values.
         Connecting to buck50 device (press CTRL-C to abort ...  )
         Firmware identity match: 0xea017af5
-        Firmware version  match: 0.9.0
+        Firmware version  match: 0.9.1
         Device serial number:    123456789abcdef987654321
         Found /usr/bin/pulseview and /usr/bin/gnuplot. Have now set: 
         configure logic autodump=enabled oscope autodump=enabled dump output=file auto-digital=enabled auto-analog=enabled digital-frmt=csv viewer-csv=gnuplot viewer-vcd=pulseview
@@ -2294,11 +2294,13 @@ Note also that when used as a usart-to-USB-to-UNIX-pseudoterminal bridge (see [`
 
 ##### `usart` configuration
 
-        $1.50: help usart usart 
+        $1.50: help usart usart
         Help for configuration "usart" (e.g. "usart usart"):
         Configuration for async/sync (UART/USART) serial peripheral on ports PA9(TX),
             PA10(RX) and PA8(clock) (if "ports=pa8-10") or ports PA2(TX), PA3(RX),
             PA1(RTS) and PA0(CTS) (if "ports=pa0-3")
+          - Note "datalen=7bits" with "parity=none", or "datalen=9bits" with other than
+            "parity=none," not supported.
         Command/configuration usage:
            usart [<parameter>=<value> ...] [<action>]
         Actions:
@@ -2310,15 +2312,15 @@ Note also that when used as a usart-to-USB-to-UNIX-pseudoterminal bridge (see [`
             recv=           Receive RX data on port PA10
             ports=          Select one of two hardware USARTs (by PAx-y port...
             baud=           Baud rate for both xmit and recv if "synchro=ena...
-            datalen=        Number of data bits
+            datalen=        Number of data bits. See "help usart usart" for ...
             stoplen=        Number of stop bits
-            parity=         Generate parity bit
+            parity=         Parity. See "help usart usart" for restrictions ...
             synchro=        Async(UART)(no clock) or synchronous(USART) mode
-            idle=           Clock output level at idle in "synchro=enabled" m...
+            idle=           Clock output level at idle in "synchro=enabled" ...
             phase=          Clock edge to sample bit at in "synchro=enabled"...
             lastclok=       Last clock pulse in "synchro=enabled" mode
             gpio=           Ports output slew rate
-            rate=           Byte output data rateSee "Time/Frequency Errors"...
+            rate=           Byte output data rate. See "Time/Frequency Error...
             tx-timeout=     Wait for hardware TX ready. See "Time/Frequency ...
             rx-wait=        Wait for hardware RX ready. See "Time/Frequency ...
             tx-data=        Byte to xmit in "monitor" command if "synchro=en...
@@ -2395,9 +2397,9 @@ Note also that when used as a usart-to-USB-to-UNIX-pseudoterminal bridge (see [`
 
         $1.50: help usart datalen=
         Help for parameter "datalen=" (e.g. "usart usart datalen="):
-        - Number of data bits
+        - Number of data bits. See "help usart usart" for restrictions with "parity=".
         Current value: 8bits
-        Valid values:  "8bits" or "9bits"
+        Valid values:  "7bits", "8bits", or "9bits"
         Type "help usart usart" for list of usart configuration parameters
         Type "help usart" for command description
 
@@ -2411,7 +2413,7 @@ Note also that when used as a usart-to-USB-to-UNIX-pseudoterminal bridge (see [`
 
         $1.50: help usart parity=
         Help for parameter "parity=" (e.g. "usart usart parity="):
-        - Generate parity bit
+        - Parity. See "help usart usart" for restrictions with "datalen=".
         Current value: none
         Valid values:  "none", "even", or "odd"
         Type "help usart usart" for list of usart configuration parameters

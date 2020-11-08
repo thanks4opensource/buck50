@@ -23,7 +23,7 @@
 
 #define REGBITS_MAJOR_VERSION   1
 #define REGBITS_MINOR_VERSION   0
-#define REGBITS_MICRO_VERSION   1
+#define REGBITS_MICRO_VERSION   2
 
 
 namespace regbits {

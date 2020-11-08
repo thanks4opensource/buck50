@@ -47,7 +47,7 @@ import tty
 #
 #
 
-VERSION = (0, 9, 0)
+VERSION = (0, 9, 1)
 
 COPYRIGHT = '''%s %d.%d.%d
 Copyright 2020 Mark R. Rubin aka "thanks4opensource"''' \
@@ -1796,9 +1796,11 @@ class UsartPorts(StringsAndValues):
 
 
 class UsartDataBits(StringsAndValues):
-    BITS_8 = 0
-    BITS_9 = 1
+    BITS_7 = -1
+    BITS_8 =  0
+    BITS_9 =  1
     strings_and_values = {
+        '7bits' : BITS_7,
         '8bits' : BITS_8,
         '9bits' : BITS_9,
     }
@@ -2683,6 +2685,8 @@ usart_config._actions = {
 }
 usart_config.__help = """
 Configuration for async/sync (UART/USART) serial peripheral on ports PA9(TX), PA10(RX) and PA8(clock) (if "ports=pa8-10") or ports PA2(TX), PA3(RX), PA1(RTS) and PA0(CTS) (if "ports=pa0-3")
+  - Note "datalen=7bits" with "parity=none", or "datalen=9bits" with other than "parity=none," not supported.
+
 """
 usart_config['active'    ]._help = "Used by monitor command"
 usart_config['xmit'      ]._help = "Transmit RX data on port PA9"
@@ -2697,9 +2701,12 @@ usart_config['baud'      ]._help = "Baud rate for both xmit and recv if "   \
                                    "\"disabled\". "                         \
                                    "See \"Time/Frequency Errors\" section " \
                                    "in \"help\"."
-usart_config['datalen'   ]._help = "Number of data bits"
+usart_config['datalen'   ]._help = "Number of data bits. See \"help "       \
+                                   "usart usart\" for restrictions with "   \
+                                   "\"parity=\"."
 usart_config['stoplen'   ]._help = "Number of stop bits"
-usart_config['parity'    ]._help = "Generate parity bit"
+usart_config['parity'    ]._help = "Parity. See \"help usart usart\" "      \
+                                   "for restrictions with \"datalen=\"."
 usart_config['synchro'   ]._help = "Async(UART)(no clock) or "              \
                                    "synchronous(USART) mode"
 usart_config['idle'      ]._help = "Clock output level at idle in "         \
@@ -3290,6 +3297,32 @@ def check_spi():
         return True
 
 
+def st_usart_settings():
+    if     usart_config['parity' ].val == UsartParity  .NONE  \
+       and usart_config['datalen'].val == UsartDataBits.BITS_7:
+        Pager(stream=sys.stderr)("Error: Unsupported USART configuration "
+                                 "\"datalen=7bits\" with \"parity=none\".",
+                                 immed=True, one_line=True, indent=7      )
+        return None
+    if     usart_config['parity' ].val != UsartParity  .NONE  \
+       and usart_config['datalen'].val == UsartDataBits.BITS_9:
+        Pager(stream=sys.stderr)("Error: Unsupported USART configuration "
+                                 "\"datalen=9bits\" with \"parity=even\" "
+                                 "or \"parity=odd\"."                     ,
+                                 immed=True, one_line=True, indent=7      )
+        return None
+    if   usart_config['datalen'].val == UsartDataBits.BITS_7:
+        return (UsartDataBits.BITS_8, usart_config['parity'].val)
+    elif usart_config['datalen'].val == UsartDataBits.BITS_9:
+        return (UsartDataBits.BITS_9, UsartParity.NONE)
+    else:
+        if usart_config['parity'].val == UsartParity.NONE:
+            return (UsartDataBits.BITS_8, UsartParity.NONE)
+        else:
+            return (UsartDataBits.BITS_9, usart_config['parity'].val)
+
+
+
 def check_usart():
     if      usart_config['ports'].val == UsartPorts.PA_8_10          \
        and (usart_config['cts'  ].val or usart_config['cts'].val):
@@ -3304,12 +3337,8 @@ def check_usart():
                                  "with \"usart=pa8-10\" because synchro "
                                  "only available for\"usart=pa0-3\"",
                                  immed=True, one_line=True, indent=9       )
-    if     usart_config['parity' ].val != UsartParity  .NONE      \
-       and usart_config['datalen'].val == UsartDataBits.BITS_8:
-        Pager(stream=sys.stderr)("Warning: Need usart \"datalen=9bits\" "
-                                 "with \"parity=even\" or \"=odd\" "
-                                 "(will have incorrect data if not)."      ,
-                                 immed=True, one_line=True, indent=9       )
+    if not st_usart_settings():
+        return False
     if usart_config['synchro'].val and not usart_config['xmit'].val:
         return r_u_sure("usart \"synchro=enabled\" but \"xmit=disabled\". "
                         "Continue?"                                        )
@@ -4506,29 +4535,28 @@ def usb_bridge_stdin(ascii_numeric, end_bytes):
 
 
 def usb_bridge_usb(ascii_numeric):
-    message = wait_read(1)
-    if message in (WAIT_READ_STDIN, None):
-        if len(message) > 0:
+    length_byte = wait_read(1)
+    if length_byte in (WAIT_READ_STDIN, None):
+        if len(length_byte) > 0:
             Pager(stream=sys.stderr)("Interrupted while waiting "
                                      "for USB, text ignored")
         return False
-    length = int(message[0])
-    message += wait_read(length + 1)     # status byte
-    if message in (WAIT_READ_STDIN, None):
-        if len(message) > 0:
+    status_data = wait_read(int(length_byte[0]) + 1)   # +1 for status byte
+    if status_data in (WAIT_READ_STDIN, None):
+        if len(status_data) > 0:
             Pager(stream=sys.stderr)("Interrupted while waiting "
                                      "for USB, text ignored")
         return False
-    status = int(message[1])
+    status = int(status_data[0])
     if ascii_numeric == AsciiNumeric.NUMERIC:
         text = " ".join([      '%03d-%02x-%c'
                              % (byte,
                                 byte,
                                 chr(byte) if byte in range(32, 128) else '.')
                          for byte
-                         in   message[2:]                                    ])
+                         in   status_data[1:]                                ])
     else:
-        text = decode_escape(message[2:])
+        text = decode_escape(status_data[1:])
     Pager()(  text
             + (    ''
                if   status == 0
@@ -5686,6 +5714,7 @@ def live_cmd(cmd, input, fields):
         term_size  = shutil.get_terminal_size().lines
         linenumber = 0
 
+    # must call check_usart() before st_usart_settings(), below
     if   spi_config['mode'  ].str() != 'disabled' and not check_spi  (): return
     if usart_config['active'].val                 and not check_usart(): return
 
@@ -5714,19 +5743,20 @@ def live_cmd(cmd, input, fields):
                           live_config['rate'      ].val   ))  # 64 bits
 
     if usart_config['active'].val:
+        (datalen, parity) = st_usart_settings()  # never None, did check_usart()
         os.write(usb_fd, struct.pack("<10B HI 2I"                    ,
                                      USRT_CMD                          ,
                                      pack_bits(usart_config['xmit'    ].val,
                                                usart_config['recv'    ].val,
                                                usart_config['synchro' ].val,
-                                               usart_config['datalen' ].val,
+                                                             datalen       ,
                                                usart_config['idle'    ].val,
                                                usart_config['phase'   ].val,
                                                usart_config['lastclok'].val),
                                      pack_bits(usart_config['rts'     ].val,
                                                usart_config['cts'     ].val,
                                                usart_config['ports'   ].val),
-                                     usart_config['parity'    ].val, # o/f,o/e
+                                                   parity          ,
                                      usart_config['stoplen'   ].val,
                                      usart_config['gpio'      ].val,
                                      usart_config['tx-data'   ].val,
@@ -6068,21 +6098,24 @@ def usart_cmd(cmd, input, fields):
        and not usart_config['end'].val:
         sys.stderr.write("Must set non-null \"end\" parameter\n")
         return
+
+    # must call check_usart() before st_usart_settings()
     if not check_usart() or not check_data_socket_pty():
         return
+    (datalen, parity) = st_usart_settings()  # never None, did check_usart()
     os.write(usb_fd, struct.pack("<10B HI 2I"                    ,
                                  USRT_CMD                          ,
                                  pack_bits(usart_config['xmit'    ].val,
                                            usart_config['recv'    ].val,
                                            usart_config['synchro' ].val,
-                                           usart_config['datalen' ].val,
+                                                         datalen       ,
                                            usart_config['idle'    ].val,
                                            usart_config['phase'   ].val,
                                            usart_config['lastclok'].val),
                                  pack_bits(usart_config['rts'     ].val,
                                            usart_config['cts'     ].val,
                                            usart_config['ports'   ].val),
-                                 usart_config['parity'    ].val, # o/f,o/e
+                                              parity           ,
                                  usart_config['stoplen'   ].val,
                                  usart_config['gpio'      ].val,
                                  usart_config['tx-data'   ].val,

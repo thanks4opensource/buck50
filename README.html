@@ -20,9 +20,9 @@
 <li>Complex triggering via user-defined state machine supporting combinations of sequential (&#8220;A then B then C&#8221;) and logical-OR (&#8220;A or B or C&#8221;) conditionals</li>
 <li>Output to VCD and other file formats for export to waveform viewing software <a href="#footnote_1"><sup>1</sup></a></li>
 </ul></li>
-<li>Live monitoring and logging of digital, analog, USART (sync/async), SPI (MOSI/MISO), and I2C data</li>
+<li>Live monitoring and logging of digital, analog, USART (sync/async), SPI (MOSI/MISO), and I2C (master/slave/TX/RX) data</li>
 <li>Simple dual-channel approx. 1 MHz digital storage oscilloscope, approx. 5K sample buffer depth (10K if single channel)</li>
-<li>3 channel digital pulse train generator with user-defined frequency and per-channel duty cycle and polarity.</li>
+<li>3 channel digital pulse train generator with user-defined frequency and per-channel duty cycle and polarity</li>
 <li>Bidirectional bridge/converter from USART/UART (async/synchro), SPI (master/slave), or I2C &#8230; to USB &#8230; to host terminal, UNIX socket, or UNIX pty device file</li>
 <li>8-bit parallel output counter (binary or gray code)</li>
 <li>Host terminal ascii or binary input data to 8-bit parallel output</li>
@@ -360,7 +360,7 @@ USART bridge:</p>
 
 <p>A valid criticism &#8230; but there is hope. That&#8217;s why you, the sophisticated user, chose to read this section. ;) Remember all that stuff that got printed when the program started?</p>
 
-<pre><code>    buck50.py 0.9.0
+<pre><code>    buck50.py 0.9.1
     Copyright 2020 Mark R. Rubin aka &quot;thanks4opensource&quot;
     This is free software with ABSOLUTELY NO WARRANTY.
     For details type &quot;warranty&quot; or &quot;help warranty&quot;.
@@ -541,7 +541,7 @@ Second, the keyboard <code>TAB</code> key completes any unambiguous partially-ty
 <p>Normal startup:</p>
 
 <pre><code>    $ buck50.py
-    buck50.py 0.9.0
+    buck50.py 0.9.1
     Copyright 2020 Mark R. Rubin aka &quot;thanks4opensource&quot;
     This is free software with ABSOLUTELY NO WARRANTY.
     For details type &quot;warranty&quot; or &quot;help warranty&quot;.
@@ -549,7 +549,7 @@ Second, the keyboard <code>TAB</code> key completes any unambiguous partially-ty
     Type &quot;help&quot; for commands, configurations, parameters, values.
     Connecting to buck50 device (press CTRL-C to abort ...  )
     Firmware identity match: 0xea017af5
-    Firmware version  match: 0.9.0
+    Firmware version  match: 0.9.1
     Device serial number:    123456789abcdef987654321
     Found /usr/bin/pulseview and /usr/bin/gnuplot. Have now set: 
     configure logic autodump=enabled oscope autodump=enabled dump output=file auto-digital=enabled auto-analog=enabled digital-frmt=csv viewer-csv=gnuplot viewer-vcd=pulseview
@@ -2382,11 +2382,13 @@ Note that if synchronous mode is enabled (see <a href="#usart_synchro_param"><co
 
 <h5 id="usartconfiguration"><code>usart</code> configuration</h5>
 
-<pre><code>    $1.50: help usart usart 
+<pre><code>    $1.50: help usart usart
     Help for configuration &quot;usart&quot; (e.g. &quot;usart usart&quot;):
     Configuration for async/sync (UART/USART) serial peripheral on ports PA9(TX),
         PA10(RX) and PA8(clock) (if &quot;ports=pa8-10&quot;) or ports PA2(TX), PA3(RX),
         PA1(RTS) and PA0(CTS) (if &quot;ports=pa0-3&quot;)
+      - Note &quot;datalen=7bits&quot; with &quot;parity=none&quot;, or &quot;datalen=9bits&quot; with other than
+        &quot;parity=none,&quot; not supported.
     Command/configuration usage:
        usart [&lt;parameter&gt;=&lt;value&gt; ...] [&lt;action&gt;]
     Actions:
@@ -2398,15 +2400,15 @@ Note that if synchronous mode is enabled (see <a href="#usart_synchro_param"><co
         recv=           Receive RX data on port PA10
         ports=          Select one of two hardware USARTs (by PAx-y port...
         baud=           Baud rate for both xmit and recv if &quot;synchro=ena...
-        datalen=        Number of data bits
+        datalen=        Number of data bits. See &quot;help usart usart&quot; for ...
         stoplen=        Number of stop bits
-        parity=         Generate parity bit
+        parity=         Parity. See &quot;help usart usart&quot; for restrictions ...
         synchro=        Async(UART)(no clock) or synchronous(USART) mode
-        idle=           Clock output level at idle in &quot;synchro=enabled&quot; m...
+        idle=           Clock output level at idle in &quot;synchro=enabled&quot; ...
         phase=          Clock edge to sample bit at in &quot;synchro=enabled&quot;...
         lastclok=       Last clock pulse in &quot;synchro=enabled&quot; mode
         gpio=           Ports output slew rate
-        rate=           Byte output data rateSee &quot;Time/Frequency Errors&quot;...
+        rate=           Byte output data rate. See &quot;Time/Frequency Error...
         tx-timeout=     Wait for hardware TX ready. See &quot;Time/Frequency ...
         rx-wait=        Wait for hardware RX ready. See &quot;Time/Frequency ...
         tx-data=        Byte to xmit in &quot;monitor&quot; command if &quot;synchro=en...
@@ -2484,9 +2486,9 @@ Note that if synchronous mode is enabled (see <a href="#usart_synchro_param"><co
 
     $1.50: help usart datalen=
     Help for parameter &quot;datalen=&quot; (e.g. &quot;usart usart datalen=&quot;):
-    - Number of data bits
+    - Number of data bits. See &quot;help usart usart&quot; for restrictions with &quot;parity=&quot;.
     Current value: 8bits
-    Valid values:  &quot;8bits&quot; or &quot;9bits&quot;
+    Valid values:  &quot;7bits&quot;, &quot;8bits&quot;, or &quot;9bits&quot;
     Type &quot;help usart usart&quot; for list of usart configuration parameters
     Type &quot;help usart&quot; for command description
 
@@ -2500,7 +2502,7 @@ Note that if synchronous mode is enabled (see <a href="#usart_synchro_param"><co
 
     $1.50: help usart parity=
     Help for parameter &quot;parity=&quot; (e.g. &quot;usart usart parity=&quot;):
-    - Generate parity bit
+    - Parity. See &quot;help usart usart&quot; for restrictions with &quot;datalen=&quot;.
     Current value: none
     Valid values:  &quot;none&quot;, &quot;even&quot;, or &quot;odd&quot;
     Type &quot;help usart usart&quot; for list of usart configuration parameters

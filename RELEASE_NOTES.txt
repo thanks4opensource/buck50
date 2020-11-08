@@ -1,3 +1,12 @@
+0.9.1   2020 Nov 07
+-------------------
+* Fix potential problem if failed USB communications in buck50.py usb_bridge_usb()
+* Changed buck50.py usart config datalen and parity from ST peripheral specific to standard semantics
+* Belated bump of regbits.hxx micro version to 1.0.2
+* README.md update and minor changes
+
+
+
 0.9.0	2020 Nov 05
 -------------------
 * Initial GitHub release
