@@ -1,3 +1,11 @@
+0.9.2	2020 Nov 07
+-------------------
+* Added buck50.py --halt option
+* Additional minor buck50.py improvements and cleanup.
+* No change except version number in buck50.{cxx,elf,bin,hex}
+
+
+
 0.9.1   2020 Nov 07
 -------------------
 * Fix potential problem if failed USB communications in buck50.py usb_bridge_usb()

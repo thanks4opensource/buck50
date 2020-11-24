@@ -53,7 +53,7 @@ typedef uint32_t    jmp_buf[_JBLEN];
 static const uint32_t   IDENTITY              = 0xea017af5;
 static const uint8_t    MAX_BRIDGE_DATA_LEN   = 62        ,
                         MAX_ADC_CHANNEL_NUM   =  7        ,
-                        VERSION            [] = {0, 9, 1},
+                        VERSION            [] = {0, 9, 2},
                         CONNECT_SIG_BYTE_0    = 0xf2      ;
 
 // See wait_connect_signature()

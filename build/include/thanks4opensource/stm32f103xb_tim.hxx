@@ -20,7 +20,7 @@
 
 // included multiple times, only from stm32f767.hxx
 #ifndef STM32F103XB_TIM_HXX_INCLUDE
-#error -- private file, #include stm32f767xx_tim.hxx only from stm32f103.hxx
+#error -- private file, #include stm32f103xb_tim.hxx only from stm32f103xb.hxx
 #else
 
 #if STM32F103XB_MAJOR_VERSION == 1

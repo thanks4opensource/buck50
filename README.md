@@ -67,6 +67,7 @@ Contents
         * [Sparse timestamped samples](#sparse_timestamped_samples)
     * [Why so slow?](#why_so_slow)
 * [Building from source](#building_from_source)
+* [Current version](#current_version)
 * [Future work](#future_work)
 * [Footnotes](#footnotes)
 
@@ -326,7 +327,7 @@ After reading the above, an reasonable reaction might be: *You want me to type a
 
 A valid criticism ... but there is hope. That's why you, the sophisticated user, chose to read this section. ;) Remember all that stuff that got printed when the program started?
 
-        buck50.py 0.9.1
+        buck50.py 0.9.2
         Copyright 2020 Mark R. Rubin aka "thanks4opensource"
         This is free software with ABSOLUTELY NO WARRANTY.
         For details type "warranty" or "help warranty".
@@ -474,8 +475,10 @@ First, however, the program needs to be started from a UNIX shell ...
 
 Commandline arguments:
 
-        $ buck50.py --help   
-        usage: buck50.py [-h] [-v] [-q] [-f [FILE]] [-x] [acm]
+        $ ./buck50.py --help
+        usage: buck50.py [-h] [-v] [-q] [-f [FILE]] [-x]
+                         [--halt {monitor,gpio,usart,spi,i2c,numbers}]
+                         [acm]
 
         positional arguments:
           acm                   CDC/ACM device (with or without "/dev" or "/dev/tty"
@@ -495,12 +498,18 @@ Commandline arguments:
                                 analog= viewer-csv= viewer-vcd= digital-frmt= analog-
                                 frmt=" parameters. See "help xxx ..." for those
                                 commands/configurations/parameters. (default: False)
+          --halt {monitor,gpio,usart,spi,i2c,numbers}
+                                Experimental. Reset firmware if buck50.py exit while
+                                command in progress. Must be done before buck50.py
+                                without "--halt", and must specify correct command
+                                name, else firmware/hardware reset and/or power cycle,
+                                and USB re-enumeration required. (default: none)
 
 
 Normal startup:
 
         $ buck50.py
-        buck50.py 0.9.1
+        buck50.py 0.9.2
         Copyright 2020 Mark R. Rubin aka "thanks4opensource"
         This is free software with ABSOLUTELY NO WARRANTY.
         For details type "warranty" or "help warranty".
@@ -508,7 +517,7 @@ Normal startup:
         Type "help" for commands, configurations, parameters, values.
         Connecting to buck50 device (press CTRL-C to abort ...  )
         Firmware identity match: 0xea017af5
-        Firmware version  match: 0.9.1
+        Firmware version  match: 0.9.2
         Device serial number:    123456789abcdef987654321
         Found /usr/bin/pulseview and /usr/bin/gnuplot. Have now set: 
         configure logic autodump=enabled oscope autodump=enabled dump output=file auto-digital=enabled auto-analog=enabled digital-frmt=csv viewer-csv=gnuplot viewer-vcd=pulseview
@@ -3851,6 +3860,20 @@ The pre-made binaries have been built with the [GNU Arm Embedded Toolchain](http
 Building with other toolchains will likely require option and possibly source code changes, and the user may want to replace the [stm32f103_flash_init.c](build/init/stm32f103_flash_init.c) startup code and [low_stack_flash.ld](build/src/low_stack_flash.ld) with a more platform-appropriate implementations. (See [above](#following_hacks) and the `low_stack_flash.ld` source concerning the required memory layout.)
 
 Reports about successes or failures building buck50 in different environments are welcome.
+
+
+
+
+<br> <a name="current_version"></a>
+Current version
+---------------
+
+        $ egrep 'VERSION.*{' build/src/buck50.cxx 
+                                VERSION            [] = {0, 9, 2},
+
+        $ ./buck50.py --version
+        buck50.py 0.9.2
+        Copyright 2020 Mark R. Rubin aka "thanks4opensource"
 
 
 

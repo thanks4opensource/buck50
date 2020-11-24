@@ -94,6 +94,7 @@ Contents</h2>
 <li><a href="#why_so_slow">Why so slow?</a></li>
 </ul></li>
 <li><a href="#building_from_source">Building from source</a></li>
+<li><a href="#current_version">Current version</a></li>
 <li><a href="#future_work">Future work</a></li>
 <li><a href="#footnotes">Footnotes</a></li>
 </ul>
@@ -360,7 +361,7 @@ USART bridge:</p>
 
 <p>A valid criticism &#8230; but there is hope. That&#8217;s why you, the sophisticated user, chose to read this section. ;) Remember all that stuff that got printed when the program started?</p>
 
-<pre><code>    buck50.py 0.9.1
+<pre><code>    buck50.py 0.9.2
     Copyright 2020 Mark R. Rubin aka &quot;thanks4opensource&quot;
     This is free software with ABSOLUTELY NO WARRANTY.
     For details type &quot;warranty&quot; or &quot;help warranty&quot;.
@@ -515,8 +516,10 @@ Second, the keyboard <code>TAB</code> key completes any unambiguous partially-ty
 
 <p>Commandline arguments:</p>
 
-<pre><code>    $ buck50.py --help   
-    usage: buck50.py [-h] [-v] [-q] [-f [FILE]] [-x] [acm]
+<pre><code>    $ ./buck50.py --help
+    usage: buck50.py [-h] [-v] [-q] [-f [FILE]] [-x]
+                     [--halt {monitor,gpio,usart,spi,i2c,numbers}]
+                     [acm]
 
     positional arguments:
       acm                   CDC/ACM device (with or without &quot;/dev&quot; or &quot;/dev/tty&quot;
@@ -536,12 +539,18 @@ Second, the keyboard <code>TAB</code> key completes any unambiguous partially-ty
                             analog= viewer-csv= viewer-vcd= digital-frmt= analog-
                             frmt=&quot; parameters. See &quot;help xxx ...&quot; for those
                             commands/configurations/parameters. (default: False)
+      --halt {monitor,gpio,usart,spi,i2c,numbers}
+                            Experimental. Reset firmware if buck50.py exit while
+                            command in progress. Must be done before buck50.py
+                            without &quot;--halt&quot;, and must specify correct command
+                            name, else firmware/hardware reset and/or power cycle,
+                            and USB re-enumeration required. (default: none)
 </code></pre>
 
 <p>Normal startup:</p>
 
 <pre><code>    $ buck50.py
-    buck50.py 0.9.1
+    buck50.py 0.9.2
     Copyright 2020 Mark R. Rubin aka &quot;thanks4opensource&quot;
     This is free software with ABSOLUTELY NO WARRANTY.
     For details type &quot;warranty&quot; or &quot;help warranty&quot;.
@@ -549,7 +558,7 @@ Second, the keyboard <code>TAB</code> key completes any unambiguous partially-ty
     Type &quot;help&quot; for commands, configurations, parameters, values.
     Connecting to buck50 device (press CTRL-C to abort ...  )
     Firmware identity match: 0xea017af5
-    Firmware version  match: 0.9.1
+    Firmware version  match: 0.9.2
     Device serial number:    123456789abcdef987654321
     Found /usr/bin/pulseview and /usr/bin/gnuplot. Have now set: 
     configure logic autodump=enabled oscope autodump=enabled dump output=file auto-digital=enabled auto-analog=enabled digital-frmt=csv viewer-csv=gnuplot viewer-vcd=pulseview
@@ -3963,6 +3972,17 @@ Building from source</h2>
 <p>Building with other toolchains will likely require option and possibly source code changes, and the user may want to replace the <a href="build/init/stm32f103_flash_init.c">stm32f103_flash_init.c</a> startup code and <a href="build/src/low_stack_flash.ld">low_stack_flash.ld</a> with a more platform-appropriate implementations. (See <a href="#following_hacks">above</a> and the <code>low_stack_flash.ld</code> source concerning the required memory layout.)</p>
 
 <p>Reports about successes or failures building buck50 in different environments are welcome.</p>
+
+<h2 id="branamecurrent_versionacurrentversion"><br> <a name="current_version"></a>
+Current version</h2>
+
+<pre><code>    $ egrep 'VERSION.*{' build/src/buck50.cxx 
+                            VERSION            [] = {0, 9, 2},
+
+    $ ./buck50.py --version
+    buck50.py 0.9.2
+    Copyright 2020 Mark R. Rubin aka &quot;thanks4opensource&quot;
+</code></pre>
 
 <h2 id="branamefuture_workafuturework"><br> <a name="future_work"></a>
 Future work</h2>

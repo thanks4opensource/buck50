@@ -431,17 +431,17 @@ LOAD linker stubs
  .debug_line    0x000000000000c694       0xec buck50_asm.o
  .debug_line    0x000000000000c780      0x9ec stm32f103_flash_init.o
 
-.debug_str      0x0000000000000000   0x188fef
- .debug_str     0x0000000000000000   0x136083 buck50.o
-                                     0x136d4a (size before relaxing)
- .debug_str     0x0000000000136083      0xceb usb_dev.o
-                                      0xfc088 (size before relaxing)
- .debug_str     0x0000000000136d6e      0x121 usb_dev_cdc_acm.o
-                                      0xfb58c (size before relaxing)
- .debug_str     0x0000000000136e8f       0x1f buck50_asm.o
-                                         0x5c (size before relaxing)
- .debug_str     0x0000000000136eae    0x52141 stm32f103_flash_init.o
-                                      0x55cb6 (size before relaxing)
+.debug_str      0x0000000000000000   0x188fe8
+ .debug_str     0x0000000000000000   0x13607c buck50.o
+                                     0x136d43 (size before relaxing)
+ .debug_str     0x000000000013607c      0xceb usb_dev.o
+                                      0xfc081 (size before relaxing)
+ .debug_str     0x0000000000136d67      0x121 usb_dev_cdc_acm.o
+                                      0xfb585 (size before relaxing)
+ .debug_str     0x0000000000136e88       0x1f buck50_asm.o
+                                         0x55 (size before relaxing)
+ .debug_str     0x0000000000136ea7    0x52141 stm32f103_flash_init.o
+                                      0x55caf (size before relaxing)
 
 .comment        0x0000000000000000       0x4c
  .comment       0x0000000000000000       0x4c buck50.o
