@@ -4262,18 +4262,17 @@ def upload_analog(samples     ,
                   filename    ):
     # recompute each time because MCU_HZ might
     #   have been changet by configure['adjust'] action
-    # unknown why off by factor of 2
-    #   seems consistent across sample/hold/adc times
-    FUDGE = 0.5
+    # firmware uses ADCPRE_DIV_6
+    ADCCLK_HZ = CPU_HZ / 6.0
     SAMPLE_MICROSECONDS = {
-        AdcSampHold.T_1_5   : FUDGE * (1.5   + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_7_5   : FUDGE * (7.5   + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_13_5  : FUDGE * (13.5  + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_28_5  : FUDGE * (28.5  + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_41_5  : FUDGE * (41.5  + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_55_5  : FUDGE * (55.5  + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_71_5  : FUDGE * (71.5  + 12.5) * 12 / CPU_HZ,
-        AdcSampHold.T_239_5 : FUDGE * (239.5 + 12.5) * 12 / CPU_HZ,
+        AdcSampHold.T_1_5   : (1.5   + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_7_5   : (7.5   + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_13_5  : (13.5  + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_28_5  : (28.5  + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_41_5  : (41.5  + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_55_5  : (55.5  + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_71_5  : (71.5  + 12.5) / ADCCLK_HZ,
+        AdcSampHold.T_239_5 : (239.5 + 12.5) / ADCCLK_HZ,
     }
 
     trig_chan_name = adc_configs[channel_ndxs & 0x0f]['name'].val
@@ -4328,7 +4327,7 @@ def upload_analog(samples     ,
                     trig_chan_name,
                     trgr_printf   )
         if file:
-            file.write("time,%s" % trig_chan_name)
+            file.write("time,%s\n" % trig_chan_name)
     else: # two channels
         printf =   "%%4d   %s    %s %s   %s %s\n"   \
                  % (time_printf   ,
@@ -4366,7 +4365,10 @@ def upload_analog(samples     ,
                                  ranged_2  )
         if file:
             if num_channels == 1:
-                file.write("%g,%g\n" % (num * tick, ranged_1))
+                file.write("%g,%g\n%g,%g\n" % ( num * tick     ,
+                                                ranged_1       ,
+                                               (num + 1) * tick,
+                                                ranged_2)      )
             else:
                 file.write("%g,%g,%g\n" % (num * tick, ranged_1, ranged_2))
         else:
