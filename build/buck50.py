@@ -49,7 +49,7 @@ import tty
 #
 #
 
-VERSION = (0, 9, 2)
+VERSION = (0, 9, 3)
 
 COPYRIGHT = '''%s %d.%d.%d
 Copyright 2020 Mark R. Rubin aka "thanks4opensource"''' \

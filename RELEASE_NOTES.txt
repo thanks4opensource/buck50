@@ -1,3 +1,11 @@
+0.9.2 buck50.{cxx,elf}  0.9.3 buck50.py    2020 Dec 30 Wed
+----------------------------------------------------------
+* Fixed buck50.py upload_analog (1-channel mode) and explanation for
+  timebase scaling -- many thanks to ReAlUA for code and pull request.
+* Makefile for README.html 
+
+
+
 0.9.2	2020 Nov 07
 -------------------
 * Added buck50.py --halt option
@@ -8,8 +16,10 @@
 
 0.9.1   2020 Nov 07
 -------------------
-* Fix potential problem if failed USB communications in buck50.py usb_bridge_usb()
-* Changed buck50.py usart config datalen and parity from ST peripheral specific to standard semantics
+* Fix potential problem if failed USB communications in buck50.py
+  usb_bridge_usb()
+* Changed buck50.py usart config datalen and parity from ST peripheral
+  specific to standard semantics
 * Belated bump of regbits.hxx micro version to 1.0.2
 * README.md update and minor changes
 
