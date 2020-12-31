@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # buck50: Test and measurement firmware for “Blue Pill” STM32F103 development board
 # Copyright (C) 2019,2020 Mark R. Rubin aka "thanks4opensource"
 #
