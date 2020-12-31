@@ -1,2 +1,5 @@
 # Compiled Object files
 *.o
+
+# Experimental development
+RCS
