@@ -1,3 +1,9 @@
+0.9.2 buck50.{cxx,elf}  0.9.4 buck50.py    2021 Jan 06 Wed
+----------------------------------------------------------
+* Fixed bug and improved UI in buck50.py usart, spi, and gpio commands
+
+
+
 0.9.2 buck50.{cxx,elf}  0.9.3 buck50.py    2020 Dec 30 Wed
 ----------------------------------------------------------
 * Fixed buck50.py upload_analog (1-channel mode) and explanation for

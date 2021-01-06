@@ -49,7 +49,7 @@ import tty
 #
 #
 
-VERSION = (0, 9, 3)
+VERSION = (0, 9, 4)
 
 COPYRIGHT = '''%s %d.%d.%d
 Copyright 2020 Mark R. Rubin aka "thanks4opensource"''' \
@@ -4464,23 +4464,26 @@ def usb_bridge_stdin(ascii_numeric, end_bytes):
     encoded = None
     while encoded is None:
         if ascii_numeric == AsciiNumeric.ASCII:
-            message = None
-            while message is None:
-                message = safe_input(  "\"%s\" to finish: "
-                                     % decode_escape(end_bytes),
-                                     "usb_bridge_stdin"        )
+            message = safe_input(  "\"%s\" to finish: "
+                                 % decode_escape(end_bytes),
+                                 "usb_bridge_stdin"        )
+            if not message:
+                sys.stdout.write("continuing ...\n")
+                return True
             try:
                 encoded = encode_escape(message)
             except Exception as error:
                 Pager(stream=sys.stderr)("Internal error: %s" % error,
                                          immed=True, one_line=True   )
+                encoded = None
             else:
                 if encoded.find(end_bytes) != -1:
                     has_end = True
         else:  # AsciiNumeric.NUMERIC:
-            message = None
-            while message is None:
-                message = safe_input("\"999\" to finish: ", "usb_bridge_stdin")
+            message = safe_input("\"999\" to finish: ", "usb_bridge_stdin")
+            if not message:
+                sys.stdout.write("continuing ...\n")
+                return True
             if message.startswith('999'):
                 encoded = b'\xff'  # to exit loop, can't be empty or b'\0'
                 has_end = True
@@ -4491,6 +4494,7 @@ def usb_bridge_stdin(ascii_numeric, end_bytes):
                     Pager(stream=sys.stderr)(str(error)   ,
                                              immed=True   ,
                                              one_line=True)
+                    encoded = None
     if has_end:
         os.write(usb_fd, b'\0\0\0\0')
         return False
@@ -4516,15 +4520,13 @@ def usb_bridge_stdin(ascii_numeric, end_bytes):
 def usb_bridge_usb(ascii_numeric):
     length_byte = wait_read(1)
     if length_byte in (WAIT_READ_STDIN, None):
-        if len(length_byte) > 0:
-            Pager(stream=sys.stderr)("Interrupted while waiting "
-                                     "for USB, text ignored")
+        Pager(stream=sys.stderr)("Interrupted while waiting "
+                                 "for USB, text ignored")
         return False
     status_data = wait_read(int(length_byte[0]) + 1)   # +1 for status byte
     if status_data in (WAIT_READ_STDIN, None):
-        if len(status_data) > 0:
-            Pager(stream=sys.stderr)("Interrupted while waiting "
-                                     "for USB, text ignored")
+        Pager(stream=sys.stderr)("Interrupted while waiting "
+                                 "for USB, text ignored")
         return False
     status = int(status_data[0])
     if ascii_numeric == AsciiNumeric.NUMERIC:
