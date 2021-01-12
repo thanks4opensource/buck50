@@ -1403,9 +1403,9 @@ class FileName(object):
         (dir, file) = os.path.split(text)
         if self.__suffix and file.endswith(self.__suffix):
             file = file[:-len(self.__suffix)]
-        names  = os.listdir(None if dir is '' else dir)
+        names  = os.listdir(None if dir == '' else dir)
         names.append('..')
-        if dir is not '' and not dir.endswith('/'):
+        if dir != '' and not dir.endswith('/'):
             dir = dir + '/'
         dirs   = [    '%s%s/' % (dir, name)
                   for name
