@@ -1,3 +1,12 @@
+0.9.2 buck50.{cxx,elf}  0.9.5 buck50.py    2021 Jan 12 Tue
+-----------------------------------------------------------
+* Fixed buck50.py bugs in `dump` command with "auto-digital=disabled",
+  "auto-analog=disabled", "viewer-csv=other", "other-csv=<none>", etc.
+* Fix for Python 3.8+ "is","is not" vs. "==","!=" warning. Thanks to
+  JDuchniewicz for pull request and patch.
+
+
+
 0.9.2 buck50.{cxx,elf}  0.9.4 buck50.py    2021 Jan 06 Wed
 ----------------------------------------------------------
 * Fixed bug and improved UI in buck50.py usart, spi, and gpio commands

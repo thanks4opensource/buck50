@@ -49,7 +49,7 @@ import tty
 #
 #
 
-VERSION = (0, 9, 4)
+VERSION = (0, 9, 5)
 
 COPYRIGHT = '''%s %d.%d.%d
 Copyright 2020 Mark R. Rubin aka "thanks4opensource"''' \
@@ -1403,9 +1403,9 @@ class FileName(object):
         (dir, file) = os.path.split(text)
         if self.__suffix and file.endswith(self.__suffix):
             file = file[:-len(self.__suffix)]
-        names  = os.listdir(None if dir is '' else dir)
+        names  = os.listdir(None if dir == '' else dir)
         names.append('..')
-        if dir is not '' and not dir.endswith('/'):
+        if dir != '' and not dir.endswith('/'):
             dir = dir + '/'
         dirs   = [    '%s%s/' % (dir, name)
                   for name
@@ -4168,6 +4168,9 @@ def upload_digital(samples   ,
                 else:          file.write("0%d\n" % ndx)
         file.close()
 
+        if not upload_config['auto-digital'].val:
+            return
+
         if upload_config['digital-frmt'].val == DigitalFormat.CSV:
             if upload_config['viewer-csv'].val == Viewer.GNUPLOT:
                 commandline  = "gnuplot -e 'set object 1 rectangle from "
@@ -4209,6 +4212,8 @@ def upload_digital(samples   ,
             elif     upload_config['viewer-csv'].val == Viewer.OTHER \
                  and upload_config[ 'other-csv'].val                :
                 commandline = upload_config['other-csv'].val
+            else:
+                return
         # else format is VCD
         elif upload_config['viewer-vcd'].val == Viewer.PULSEVIEW:
             # pulseview allocates 1 byte per tick per channel (??)
@@ -4418,7 +4423,6 @@ def upload_analog(samples     ,
         file.close()
         if '%s' in commandline:
             commandline = commandline % filename
-        sys.stdout.write("Viewer commandline:\n%s\n" % commandline)
 
         if upload_config['auto-analog'].val:
             if upload_config['viewer-csv'].val in (Viewer.PULSEVIEW,
@@ -4429,6 +4433,7 @@ def upload_analog(samples     ,
                       "\"auto-analog=enabled\"."                   ,
                       immed=True,one_line=True                   )
                 return
+            sys.stdout.write("Viewer commandline:\n%s\n" % commandline)
             sys.stdout.write("Running above command "
                              "(\"auto-analog=enabled\") ...\n")
             try:
