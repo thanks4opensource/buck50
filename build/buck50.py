@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # buck50: Test and measurement firmware for “Blue Pill” STM32F103 development board
-# Copyright (C) 2019,2020 Mark R. Rubin aka "thanks4opensource"
+# Copyright (C) 2019, 2020, 2021 Mark R. Rubin aka "thanks4opensource"
 #
 # This file is part of buck50.
 #
@@ -20,7 +20,6 @@
 # <https:#www.gnu.org/licenses/gpl.html>
 
 
-#!/usr/bin/env python3
 
 import argparse
 import collections
@@ -49,7 +48,7 @@ import tty
 #
 #
 
-VERSION = (0, 9, 5)
+VERSION = (0, 9, 6)
 
 COPYRIGHT = '''%s %d.%d.%d
 Copyright 2020 Mark R. Rubin aka "thanks4opensource"''' \
@@ -4119,7 +4118,8 @@ def upload_digital(samples   ,
 
         if file:
             if save_as == DigitalFormat.VCD:
-                chng = bits ^ last
+                timval = 0
+                chng   = bits ^ last
                 if chng:
                     timval =    tcks   * upload_config['tick-units'].val \
                              / (CPU_HZ * upload_config['per-tick'  ].val)
@@ -5180,7 +5180,7 @@ def trig_cmd(cmd, input, fields):
                                      % field)
             if not deletes:
                 sys.stderr.write("Specify one or more triggers "
-                                 "to delete: [-m] [p[-q] ...\n" )
+                                 "to delete: n[-m] [p[-q] ...\n" )
                 return
             for delete in deletes:
                 if delete == 0:

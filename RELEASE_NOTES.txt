@@ -1,3 +1,11 @@
+0.9.2 buck50.{cxx,elf}  0.9.6 buck50.py    2021 Feb 12 Fri
+-----------------------------------------------------------
+* Fixed small buck50.py bugs: Missing initialization in upload_digital()
+  if no samples, typo in `help trigger trigger`, removed extra "#!" line.
+* Added simple vcd2txt.py utility.
+
+
+
 0.9.2 buck50.{cxx,elf}  0.9.5 buck50.py    2021 Jan 12 Tue
 -----------------------------------------------------------
 * Fixed buck50.py bugs in `dump` command with "auto-digital=disabled",
